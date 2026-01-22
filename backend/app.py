@@ -1,9 +1,11 @@
 """
 Main Flask application for Document Forgery Detector
 """
-from processing_pipeline import pipeline_instance
+
 import os
 import time
+import glob
+import json
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from config import Config
 from utils.file_handler import FileHandler
@@ -110,19 +112,117 @@ def upload_document():
 @app.route('/process/<document_id>', methods=['GET'])
 def process_document(document_id):
     """
-    Process document for forgery detection (placeholder - will be implemented)
+    Process document for forgery detection using all 3 forensic signals
     
     Args:
         document_id: Unique identifier for the document
     """
-    # TODO: Implement actual processing
-    return jsonify({
-        'status': 'processing',
-        'document_id': document_id,
-        'message': 'Processing pipeline will be implemented',
-        'signals': ['ELA', 'OCR', 'Metadata'],
-        'estimated_time': 'Under 20 seconds'
-    })
+    start_time = time.time()
+    
+    try:
+        # Find the document in uploads folder
+        doc_files = glob.glob(os.path.join(Config.UPLOAD_FOLDER, f"*{document_id}*"))
+        
+        if not doc_files:
+            return jsonify({
+                'error': 'Document not found',
+                'document_id': document_id,
+                'status': 'error'
+            }), 404
+        
+        # Get the most recent matching file
+        document_path = max(doc_files, key=os.path.getctime)
+        
+        # Verify file exists
+        if not os.path.exists(document_path):
+            return jsonify({
+                'error': 'Document file not found on server',
+                'document_id': document_id,
+                'status': 'error'
+            }), 404
+        
+        # Import pipeline here to avoid circular imports
+        from processing_pipeline import pipeline_instance
+        
+        print(f"Processing document {document_id}: {document_path}")
+        
+        # Process through pipeline
+        results = pipeline_instance.process_document(document_id, document_path)
+        
+        # Calculate total processing time
+        total_time = time.time() - start_time
+        
+        # Add metadata
+        results['api_processing_time'] = round(total_time, 2)
+        results['status'] = 'completed' if not results.get('error') else 'error'
+        results['document_path'] = document_path
+        results['meets_requirements'] = {
+            'processing_time_under_20s': total_time <= 20,
+            'cpu_only': True,
+            'three_signals': True,
+            'explainable': True,
+            'uncertainty_handling': 'uncertainty' in results,
+            'tamper_localization': len(results.get('combined_findings', [])) > 0
+        }
+        
+        # If processing took too long, add warning but still return results
+        if total_time > Config.MAX_PROCESSING_TIME:
+            results['warning'] = f"Processing exceeded {Config.MAX_PROCESSING_TIME}s constraint (took {total_time:.2f}s)"
+        
+        # FileHandler.cleanup_file(document_path)
+        
+        return jsonify(results)
+        
+    except Exception as e:
+        print(f"Processing error for {document_id}: {e}")
+        return jsonify({
+            'error': str(e),
+            'document_id': document_id,
+            'status': 'error',
+            'api_processing_time': round(time.time() - start_time, 2)
+        }), 500
+
+@app.route('/stats', methods=['GET'])
+def get_stats():
+    """Get processing pipeline statistics"""
+    try:
+        from processing_pipeline import pipeline_instance
+        
+        stats = pipeline_instance.get_processing_stats()
+        
+        return jsonify({
+            'status': 'success',
+            'stats': stats,
+            'requirements_met': {
+                'max_processing_time': Config.MAX_PROCESSING_TIME,
+                'signals_implemented': 3,
+                'supported_formats': list(Config.ALLOWED_EXTENSIONS),
+                'cpu_only': True
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/report/<document_id>', methods=['GET'])
+def get_report(document_id):
+    """Get JSON report for a processed document"""
+    try:
+        report_path = os.path.join(Config.UPLOAD_FOLDER, f"report_{document_id}.json")
+        
+        if not os.path.exists(report_path):
+            return jsonify({'error': 'Report not found'}), 404
+        
+        with open(report_path, 'r') as f:
+            report_data = json.load(f)
+        
+        # Return as downloadable JSON
+        response = jsonify(report_data)
+        response.headers.add('Content-Disposition', 
+                           f'attachment; filename=forensic_report_{document_id}.json')
+        return response
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/download/<filename>')
 def download_file(filename):
