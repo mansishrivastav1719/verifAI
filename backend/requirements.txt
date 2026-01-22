@@ -6,3 +6,4 @@ pdf2image==1.16.3
 numpy==1.24.3
 python-magic==0.4.27
 waitress==2.1.2
+pdfplumber==0.10.3
