@@ -1,0 +1,51 @@
+/* TEAM SECTION */
+.team {
+    padding: 80px 60px;
+    text-align: center;
+}
+
+.team h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.team-cards {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+
+.team-card {
+    background: white;
+    padding: 30px;
+    width: 220px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.team-card h3 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.team-card h4 {
+    margin-bottom: 6px;
+}
+
+/* FOOTER */
+.footer {
+    background: #2f343a;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.footer p {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.footer span {
+    font-size: 13px;
+    opacity: 0.8;
+}
