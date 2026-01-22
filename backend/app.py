@@ -1,7 +1,7 @@
 """
 Main Flask application for Document Forgery Detector
 """
-
+from processing_pipeline import pipeline_instance
 import os
 import time
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
