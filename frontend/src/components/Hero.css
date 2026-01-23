@@ -1,0 +1,98 @@
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px;
+    gap: 40px;
+}
+
+.hero-left {
+    flex: 1;
+}
+
+.hero-left h1 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+.hero-left p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.badges {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.badges span {
+    background-color: #f0f0f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #333;
+}
+
+.hero-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.upload-box {
+    border: 2px dashed #3b82f6;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    background-color: #f8f9ff;
+    min-width: 300px;
+}
+
+.upload-box .icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.upload-box p {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #000;
+}
+
+.upload-box small {
+    display: block;
+    color: #999;
+    margin-bottom: 20px;
+}
+
+.upload-box button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.upload-box button:hover {
+    background-color: #2563eb;
+}
+
+.upload-box.drag-active {
+    border-color: #2563eb;
+    background-color: #e0e7ff;
+}
+
+.upload-box .file-name {
+    font-size: 14px;
+    color: #10b981;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
