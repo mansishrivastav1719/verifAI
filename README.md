@@ -1,6 +1,6 @@
 # verifAI - Document Forgery Detection System
 
-## 🏆 Hackathon Project: ML-103 - Explainable Document Forgery Detection
+## Explainable Document Forgery Detection
 
 ### 📋 Problem Statement
 Build a system that detects document tampering with:
